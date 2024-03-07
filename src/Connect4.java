@@ -302,7 +302,14 @@ class Connect4JFrame extends JFrame implements ActionListener {
                         && advColor != deArray[row][col+1]
                         && advColor != deArray[row][col+2]
                         && advColor != deArray[row][col+3]) {
-                    plays++;
+                    int tmp = 0;
+                    if (curr == color) tmp++;
+                    if (deArray[row][col+1] == color) tmp++;
+                    if (deArray[row][col+2] == color) tmp++;
+                    if (deArray[row][col+3] == color) tmp++;
+                    if (tmp == 4) return Integer.MAX_VALUE;
+                    else if (tmp > 1) plays = plays + tmp;
+                    else plays++;
                 }
             }
         }
@@ -313,8 +320,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr!=advColor
                         && advColor != deArray[row+1][col]
                         && advColor != deArray[row+2][col]
-                        && advColor != deArray[row+3][col])
-                    plays++;
+                        && advColor != deArray[row+3][col]){
+                    int tmp = 0;
+                    if (curr == color) tmp++;
+                    if (deArray[row+1][col] == color) tmp++;
+                    if (deArray[row+2][col] == color) tmp++;
+                    if (deArray[row+3][col] == color) tmp++;
+                    if (tmp == 4) return Integer.MAX_VALUE;
+                    else if (tmp > 1) plays = plays + tmp;
+                    else plays++;
+                }
             }
         }
         // diagonal lower left to upper right
@@ -324,8 +339,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr!=advColor
                         && advColor != deArray[row+1][col+1]
                         && advColor != deArray[row+2][col+2]
-                        && advColor != deArray[row+3][col+3])
-                    plays++;
+                        && advColor != deArray[row+3][col+3]){
+                    int tmp = 0;
+                    if (curr == color) tmp++;
+                    if (deArray[row+1][col+1] == color) tmp++;
+                    if (deArray[row+2][col+2] == color) tmp++;
+                    if (deArray[row+3][col+3] == color) tmp++;
+                    if (tmp == 4) return Integer.MAX_VALUE;
+                    else if (tmp > 1) plays = plays + tmp;
+                    else plays++;
+                }
             }
         }
         // diagonal upper left to lower right
@@ -335,8 +358,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr!=advColor
                         && advColor != deArray[row-1][col+1]
                         && advColor != deArray[row-2][col+2]
-                        && advColor != deArray[row-3][col+3])
-                    plays++;
+                        && advColor != deArray[row-3][col+3]){
+                    int tmp = 0;
+                    if (curr == color) tmp++;
+                    if (deArray[row-1][col+1] == color) tmp++;
+                    if (deArray[row-2][col+2] == color) tmp++;
+                    if (deArray[row-3][col+3] == color) tmp++;
+                    if (tmp == 4) return Integer.MAX_VALUE;
+                    else if (tmp > 1) plays = plays + tmp;
+                    else plays++;
+                }
             }
         }
         for (int row=0; row<MAXROW; row++) {
@@ -346,7 +377,14 @@ class Connect4JFrame extends JFrame implements ActionListener {
                         && color != deArray[row][col+1]
                         && color != deArray[row][col+2]
                         && color != deArray[row][col+3]) {
-                    plays--;
+                    int tmp = 0;
+                    if (advColor == color) tmp--;
+                    if (deArray[row][col+1] == advColor) tmp--;
+                    if (deArray[row][col+2] == advColor) tmp--;
+                    if (deArray[row][col+3] == advColor) tmp--;
+                    if (tmp == 4) return Integer.MIN_VALUE;
+                    else if (tmp < 1) plays = plays + tmp;
+                    else plays--;
                 }
             }
         }
@@ -357,8 +395,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr!=color
                         && color != deArray[row+1][col]
                         && color != deArray[row+2][col]
-                        && color != deArray[row+3][col])
-                    plays--;
+                        && color != deArray[row+3][col]){
+                    int tmp = 0;
+                    if (advColor == color) tmp--;
+                    if (deArray[row+1][col] == advColor) tmp--;
+                    if (deArray[row+2][col] == advColor) tmp--;
+                    if (deArray[row+3][col] == advColor) tmp--;
+                    if (tmp == 4) return Integer.MIN_VALUE;
+                    else if (tmp < 1) plays = plays + tmp;
+                    else plays--;
+                }
             }
         }
         // diagonal lower left to upper right
@@ -368,8 +414,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr!=color
                         && color != deArray[row+1][col+1]
                         && color != deArray[row+2][col+2]
-                        && color != deArray[row+3][col+3])
-                    plays--;
+                        && color != deArray[row+3][col+3]){
+                    int tmp = 0;
+                    if (advColor == color) tmp--;
+                    if (deArray[row+1][col+1] == advColor) tmp--;
+                    if (deArray[row+2][col+2] == advColor) tmp--;
+                    if (deArray[row+3][col+3] == advColor) tmp--;
+                    if (tmp == 4) return Integer.MIN_VALUE;
+                    else if (tmp < 1) plays = plays + tmp;
+                    else plays--;
+                }
             }
         }
         // diagonal upper left to lower right
@@ -379,8 +433,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr!=color
                         && color != deArray[row-1][col+1]
                         && color != deArray[row-2][col+2]
-                        && color != deArray[row-3][col+3])
-                    plays--;
+                        && color != deArray[row-3][col+3]){
+                    int tmp = 0;
+                    if (advColor == color) tmp--;
+                    if (deArray[row-1][col+1] == advColor) tmp--;
+                    if (deArray[row-2][col+2] == advColor) tmp--;
+                    if (deArray[row-3][col+3] == advColor) tmp--;
+                    if (tmp == 4) return Integer.MIN_VALUE;
+                    else if (tmp < 1) plays = plays + tmp;
+                    else plays--;
+                }
             }
         }
         return plays;
