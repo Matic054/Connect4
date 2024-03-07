@@ -163,10 +163,10 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 movesR.setText(String.valueOf(movesRed));
                 activeColour = YELLOW;
                 if (randomAgent) randomPlayer();
-                if (minmaxAgent) minmaxPlayer(1);
+                if (minmaxAgent) minmaxPlayer(5);
             } else {
                 movesYellow++;
-                System.out.println(heuristic(RED, theArray));
+                //System.out.println(heuristic(RED, theArray));
                 movesY.setText(String.valueOf(movesYellow));
                 activeColour = RED;
             }
@@ -176,6 +176,8 @@ class Connect4JFrame extends JFrame implements ActionListener {
     }
 
     public void displayWinner(Graphics g, int n) {
+        randomAgent = false;
+        minmaxAgent = false;
         g.setColor(Color.BLACK);
         g.setFont(new Font("Courier", Font.BOLD, 100));
         if (n==RED)
@@ -289,7 +291,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
         }
     }
 
-    public int heuristic(int color, int [][] deArray){
+    public int heuristic(int color, int [][] deArray, int a, int b){
         int plays = 0;
         int advColor = RED;
         if (color == RED){
@@ -298,157 +300,70 @@ class Connect4JFrame extends JFrame implements ActionListener {
         for (int row=0; row<MAXROW; row++) {
             for (int col=0; col<MAXCOL-3; col++) {
                 int curr = deArray[row][col];
-                if (curr!=advColor
-                        && advColor != deArray[row][col+1]
-                        && advColor != deArray[row][col+2]
-                        && advColor != deArray[row][col+3]) {
-                    int tmp = 0;
-                    if (curr == color) tmp++;
-                    if (deArray[row][col+1] == color) tmp++;
-                    if (deArray[row][col+2] == color) tmp++;
-                    if (deArray[row][col+3] == color) tmp++;
-                    if (tmp == 4) return Integer.MAX_VALUE;
-                    else if (tmp > 1) plays = plays + tmp;
-                    else plays++;
-                }
+                int countMax=0;
+                int countMin=0;
+                if (curr == color) countMax++; else if (curr == advColor) countMin++;
+                if (deArray[row][col+1] == color) countMax++; else if (deArray[row][col+1] == advColor) countMin++;
+                if (deArray[row][col+2] == color) countMax++; else if (deArray[row][col+2] == advColor) countMin++;
+                if (deArray[row][col+3] == color) countMax++; else if (deArray[row][col+3] == advColor) countMin++;
+                if (countMax == 4) return Integer.MAX_VALUE;
+                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMin == 0) plays += Math.max(1,countMax);
+                if (countMax == 0) plays -= Math.max(1,countMin);
             }
         }
         // vertical columns
         for (int col=0; col<MAXCOL; col++) {
             for (int row=0; row<MAXROW-3; row++) {
                 int curr = deArray[row][col];
-                if (curr!=advColor
-                        && advColor != deArray[row+1][col]
-                        && advColor != deArray[row+2][col]
-                        && advColor != deArray[row+3][col]){
-                    int tmp = 0;
-                    if (curr == color) tmp++;
-                    if (deArray[row+1][col] == color) tmp++;
-                    if (deArray[row+2][col] == color) tmp++;
-                    if (deArray[row+3][col] == color) tmp++;
-                    if (tmp == 4) return Integer.MAX_VALUE;
-                    else if (tmp > 1) plays = plays + tmp;
-                    else plays++;
-                }
+                int countMax=0;
+                int countMin=0;
+                if (curr == color) countMax++; else if (curr == advColor) countMin++;
+                if (deArray[row+1][col] == color) countMax++; else if (deArray[row+1][col] == advColor) countMin++;
+                if (deArray[row+2][col] == color) countMax++; else if (deArray[row+2][col] == advColor) countMin++;
+                if (deArray[row+3][col] == color) countMax++; else if (deArray[row+3][col] == advColor) countMin++;
+                if (countMax == 4) return Integer.MAX_VALUE;
+                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMin == 0) plays += Math.max(1,countMax);
+                if (countMax == 0) plays -= Math.max(1,countMin);
             }
         }
         // diagonal lower left to upper right
         for (int row=0; row<MAXROW-3; row++) {
             for (int col=0; col<MAXCOL-3; col++) {
                 int curr = deArray[row][col];
-                if (curr!=advColor
-                        && advColor != deArray[row+1][col+1]
-                        && advColor != deArray[row+2][col+2]
-                        && advColor != deArray[row+3][col+3]){
-                    int tmp = 0;
-                    if (curr == color) tmp++;
-                    if (deArray[row+1][col+1] == color) tmp++;
-                    if (deArray[row+2][col+2] == color) tmp++;
-                    if (deArray[row+3][col+3] == color) tmp++;
-                    if (tmp == 4) return Integer.MAX_VALUE;
-                    else if (tmp > 1) plays = plays + tmp;
-                    else plays++;
-                }
+                int countMax=0;
+                int countMin=0;
+                if (curr == color) countMax++; else if (curr == advColor) countMin++;
+                if (deArray[row+1][col+1] == color) countMax++; else if (deArray[row+1][col+1] == advColor) countMin++;
+                if (deArray[row+2][col+2] == color) countMax++; else if (deArray[row+2][col+2] == advColor) countMin++;
+                if (deArray[row+3][col+3] == color) countMax++; else if (deArray[row+3][col+3] == advColor) countMin++;
+                if (countMax == 4) return Integer.MAX_VALUE;
+                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMin == 0) plays += Math.max(1,countMax);
+                if (countMax == 0) plays -= Math.max(1,countMin);
             }
         }
         // diagonal upper left to lower right
         for (int row=MAXROW-1; row>=3; row--) {
             for (int col=0; col<MAXCOL-3; col++) {
                 int curr = deArray[row][col];
-                if (curr!=advColor
-                        && advColor != deArray[row-1][col+1]
-                        && advColor != deArray[row-2][col+2]
-                        && advColor != deArray[row-3][col+3]){
-                    int tmp = 0;
-                    if (curr == color) tmp++;
-                    if (deArray[row-1][col+1] == color) tmp++;
-                    if (deArray[row-2][col+2] == color) tmp++;
-                    if (deArray[row-3][col+3] == color) tmp++;
-                    if (tmp == 4) return Integer.MAX_VALUE;
-                    else if (tmp > 1) plays = plays + tmp;
-                    else plays++;
-                }
-            }
-        }
-        for (int row=0; row<MAXROW; row++) {
-            for (int col=0; col<MAXCOL-3; col++) {
-                int curr = deArray[row][col];
-                if (curr!=color
-                        && color != deArray[row][col+1]
-                        && color != deArray[row][col+2]
-                        && color != deArray[row][col+3]) {
-                    int tmp = 0;
-                    if (advColor == color) tmp--;
-                    if (deArray[row][col+1] == advColor) tmp--;
-                    if (deArray[row][col+2] == advColor) tmp--;
-                    if (deArray[row][col+3] == advColor) tmp--;
-                    if (tmp == 4) return Integer.MIN_VALUE;
-                    else if (tmp < 1) plays = plays + tmp;
-                    else plays--;
-                }
-            }
-        }
-        // vertical columns
-        for (int col=0; col<MAXCOL; col++) {
-            for (int row=0; row<MAXROW-3; row++) {
-                int curr = deArray[row][col];
-                if (curr!=color
-                        && color != deArray[row+1][col]
-                        && color != deArray[row+2][col]
-                        && color != deArray[row+3][col]){
-                    int tmp = 0;
-                    if (advColor == color) tmp--;
-                    if (deArray[row+1][col] == advColor) tmp--;
-                    if (deArray[row+2][col] == advColor) tmp--;
-                    if (deArray[row+3][col] == advColor) tmp--;
-                    if (tmp == 4) return Integer.MIN_VALUE;
-                    else if (tmp < 1) plays = plays + tmp;
-                    else plays--;
-                }
-            }
-        }
-        // diagonal lower left to upper right
-        for (int row=0; row<MAXROW-3; row++) {
-            for (int col=0; col<MAXCOL-3; col++) {
-                int curr = deArray[row][col];
-                if (curr!=color
-                        && color != deArray[row+1][col+1]
-                        && color != deArray[row+2][col+2]
-                        && color != deArray[row+3][col+3]){
-                    int tmp = 0;
-                    if (advColor == color) tmp--;
-                    if (deArray[row+1][col+1] == advColor) tmp--;
-                    if (deArray[row+2][col+2] == advColor) tmp--;
-                    if (deArray[row+3][col+3] == advColor) tmp--;
-                    if (tmp == 4) return Integer.MIN_VALUE;
-                    else if (tmp < 1) plays = plays + tmp;
-                    else plays--;
-                }
-            }
-        }
-        // diagonal upper left to lower right
-        for (int row=MAXROW-1; row>=3; row--) {
-            for (int col=0; col<MAXCOL-3; col++) {
-                int curr = deArray[row][col];
-                if (curr!=color
-                        && color != deArray[row-1][col+1]
-                        && color != deArray[row-2][col+2]
-                        && color != deArray[row-3][col+3]){
-                    int tmp = 0;
-                    if (advColor == color) tmp--;
-                    if (deArray[row-1][col+1] == advColor) tmp--;
-                    if (deArray[row-2][col+2] == advColor) tmp--;
-                    if (deArray[row-3][col+3] == advColor) tmp--;
-                    if (tmp == 4) return Integer.MIN_VALUE;
-                    else if (tmp < 1) plays = plays + tmp;
-                    else plays--;
-                }
+                int countMax=0;
+                int countMin=0;
+                if (curr == color) countMax++; else if (curr == advColor) countMin++;
+                if (deArray[row-1][col+1] == color) countMax++; else if (deArray[row-1][col+1] == advColor) countMin++;
+                if (deArray[row-2][col+2] == color) countMax++; else if (deArray[row-2][col+2] == advColor) countMin++;
+                if (deArray[row-3][col+3] == color) countMax++; else if (deArray[row-3][col+3] == advColor) countMin++;
+                if (countMax == 4) return Integer.MAX_VALUE;
+                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMin == 0) plays += Math.max(1,countMax);
+                if (countMax == 0) plays -= Math.max(1,countMin);
             }
         }
         return plays;
     }
 
-    public int MinMax(int depth, int color, int[][] deArray){
+    public int MinMax(int depth, int color, int[][] deArray, int a, int b){
         int out;
         if (color == activeColour){
             out = Integer.MIN_VALUE;
@@ -456,7 +371,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
             out = Integer.MAX_VALUE;
         }
         if (depth == 0){
-            return heuristic(activeColour, deArray);
+            return heuristic(activeColour, deArray, a, b);
         } else {
             for (int i = 0; i < MAXCOL; i++){
                 int row;
@@ -470,12 +385,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                         if (color == RED){
                             advColor = YELLOW;
                         }
-                        int value = MinMax(depth-1, advColor, testArray);
+                        int heuristic = heuristic(activeColour, testArray, a, b);
+                        if (heuristic == Integer.MAX_VALUE || heuristic == Integer.MIN_VALUE) return heuristic;
+                        int value = MinMax(depth-1, advColor, testArray, row-1, i);
                         if (out < value){
                             out = value;
                         }
                     } else {
-                        int value = MinMax(depth-1, activeColour, testArray);
+                        int heuristic = heuristic(activeColour, testArray, a, b);
+                        if (heuristic == Integer.MAX_VALUE || heuristic == Integer.MIN_VALUE) return heuristic;
+                        int value = MinMax(depth-1, activeColour, testArray, row-1, i);
                         if (out > value){
                             out = value;
                         }
@@ -502,7 +421,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (activeColour == RED){
                     advColor = YELLOW;
                 }
-                int tmp = MinMax(depth, advColor, testArray);
+                int tmp = MinMax(depth, advColor, testArray, row-1,i);
                 if (tmp > value){
                     value = tmp;
                     choice = i;
