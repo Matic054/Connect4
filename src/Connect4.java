@@ -17,6 +17,7 @@ public class Connect4 {
         Connect4JFrame frame = new Connect4JFrame();
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        //frame.game();
     }
 }
 
@@ -29,7 +30,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
     boolean                 end=false;
     boolean                 gameStart;
 
-    boolean                 randomAgent=false;
+    boolean                 randomAgent=true;
 
     boolean                 minmaxAgent=true;
     public static final int BLANK = 0;
@@ -38,6 +39,9 @@ class Connect4JFrame extends JFrame implements ActionListener {
 
     public static final int MAXROW = 6;     // 6 rows
     public static final int MAXCOL = 7;     // 7 columns
+
+    public static final int maxValue = 100000;
+    public static final int minValue = -100000;
 
     public static final String SPACE = "                  "; // 18 spaces
 
@@ -147,6 +151,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
         check4(g);
     } // paint
 
+    public void game(){
+        if (end) return;
+        if (activeColour == RED){
+            minmaxPlayer(5);
+        } else {
+            randomPlayer();
+        }
+        if (!end) game();
+    }
+
     public void putDisk(int n) {
         // put a disk on top of column n
         // if game is won, do nothing
@@ -162,13 +176,13 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 movesRed++;
                 movesR.setText(String.valueOf(movesRed));
                 activeColour = YELLOW;
-                if (randomAgent) randomPlayer();
                 if (minmaxAgent) minmaxPlayer(5);
             } else {
                 movesYellow++;
                 //System.out.println(heuristic(RED, theArray));
                 movesY.setText(String.valueOf(movesYellow));
                 activeColour = RED;
+                //if (randomAgent) randomPlayer();
             }
             movesT.setText(String.valueOf(movesRed+movesYellow));
             repaint();
@@ -208,8 +222,9 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr>0
                         && curr == theArray[row+1][col]
                         && curr == theArray[row+2][col]
-                        && curr == theArray[row+3][col])
+                        && curr == theArray[row+3][col]) {
                     displayWinner(g, theArray[row][col]);
+                }
             }
         }
         // diagonal lower left to upper right
@@ -219,8 +234,9 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr>0
                         && curr == theArray[row+1][col+1]
                         && curr == theArray[row+2][col+2]
-                        && curr == theArray[row+3][col+3])
+                        && curr == theArray[row+3][col+3]) {
                     displayWinner(g, theArray[row][col]);
+                }
             }
         }
         // diagonal upper left to lower right
@@ -230,8 +246,9 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (curr>0
                         && curr == theArray[row-1][col+1]
                         && curr == theArray[row-2][col+2]
-                        && curr == theArray[row-3][col+3])
+                        && curr == theArray[row-3][col+3]) {
                     displayWinner(g, theArray[row][col]);
+                }
             }
         }
     } // end check4
@@ -279,6 +296,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 totalLegPlays++;
             }
         }
+        if (totalLegPlays == 0) return;
         nextMove = r.nextInt(totalLegPlays)+1;
         for (int i = 0; i < MAXCOL; i++){
             if (legalPlays[i] == 1){
@@ -291,12 +309,13 @@ class Connect4JFrame extends JFrame implements ActionListener {
         }
     }
 
-    public int heuristic(int color, int [][] deArray, int a, int b){
+    public int heuristic(int color, int [][] deArray){
         int plays = 0;
         int advColor = RED;
         if (color == RED){
             advColor = YELLOW;
         }
+        // horizontal
         for (int row=0; row<MAXROW; row++) {
             for (int col=0; col<MAXCOL-3; col++) {
                 int curr = deArray[row][col];
@@ -306,8 +325,8 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (deArray[row][col+1] == color) countMax++; else if (deArray[row][col+1] == advColor) countMin++;
                 if (deArray[row][col+2] == color) countMax++; else if (deArray[row][col+2] == advColor) countMin++;
                 if (deArray[row][col+3] == color) countMax++; else if (deArray[row][col+3] == advColor) countMin++;
-                if (countMax == 4) return Integer.MAX_VALUE;
-                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMax == 4) return maxValue;
+                if (countMin == 4) return minValue;
                 if (countMin == 0) plays += Math.max(1,countMax);
                 if (countMax == 0) plays -= Math.max(1,countMin);
             }
@@ -322,8 +341,8 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (deArray[row+1][col] == color) countMax++; else if (deArray[row+1][col] == advColor) countMin++;
                 if (deArray[row+2][col] == color) countMax++; else if (deArray[row+2][col] == advColor) countMin++;
                 if (deArray[row+3][col] == color) countMax++; else if (deArray[row+3][col] == advColor) countMin++;
-                if (countMax == 4) return Integer.MAX_VALUE;
-                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMax == 4) return maxValue;
+                if (countMin == 4) return minValue;
                 if (countMin == 0) plays += Math.max(1,countMax);
                 if (countMax == 0) plays -= Math.max(1,countMin);
             }
@@ -338,8 +357,8 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (deArray[row+1][col+1] == color) countMax++; else if (deArray[row+1][col+1] == advColor) countMin++;
                 if (deArray[row+2][col+2] == color) countMax++; else if (deArray[row+2][col+2] == advColor) countMin++;
                 if (deArray[row+3][col+3] == color) countMax++; else if (deArray[row+3][col+3] == advColor) countMin++;
-                if (countMax == 4) return Integer.MAX_VALUE;
-                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMax == 4) return maxValue;
+                if (countMin == 4) return minValue;
                 if (countMin == 0) plays += Math.max(1,countMax);
                 if (countMax == 0) plays -= Math.max(1,countMin);
             }
@@ -354,8 +373,8 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 if (deArray[row-1][col+1] == color) countMax++; else if (deArray[row-1][col+1] == advColor) countMin++;
                 if (deArray[row-2][col+2] == color) countMax++; else if (deArray[row-2][col+2] == advColor) countMin++;
                 if (deArray[row-3][col+3] == color) countMax++; else if (deArray[row-3][col+3] == advColor) countMin++;
-                if (countMax == 4) return Integer.MAX_VALUE;
-                if (countMin == 4) return Integer.MIN_VALUE;
+                if (countMax == 4) return maxValue;
+                if (countMin == 4) return minValue;
                 if (countMin == 0) plays += Math.max(1,countMax);
                 if (countMax == 0) plays -= Math.max(1,countMin);
             }
@@ -363,44 +382,28 @@ class Connect4JFrame extends JFrame implements ActionListener {
         return plays;
     }
 
-    public int MinMax(int depth, int color, int[][] deArray, int a, int b){
-        int out;
-        if (color == activeColour){
-            out = Integer.MIN_VALUE;
-        } else {
-            out = Integer.MAX_VALUE;
-        }
+    public int MinMax(int depth, int color, int[][] deArray){
+        int out = (color == activeColour) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         if (depth == 0){
-            return heuristic(activeColour, deArray, a, b);
+            return heuristic(activeColour, deArray);
         } else {
             for (int i = 0; i < MAXCOL; i++){
                 int row;
-                for (row=0; row<MAXROW; row++)
-                    if (deArray[row][i]>0) break;
+                for (row=0; row<MAXROW; row++) if (deArray[row][i]>0) break;
                 if (row>0) {
                     int[][] testArray = clone2dArray(deArray);
                     testArray[row-1][i] = color;
+                    int heuristic = heuristic(activeColour, testArray);
                     if (color == activeColour){
-                        int advColor = RED;
-                        if (color == RED){
-                            advColor = YELLOW;
-                        }
-                        int heuristic = heuristic(activeColour, testArray, a, b);
-                        if (heuristic == Integer.MAX_VALUE || heuristic == Integer.MIN_VALUE) return heuristic;
-                        int value = MinMax(depth-1, advColor, testArray, row-1, i);
-                        if (out < value){
-                            out = value;
-                        }
+                        int advColor = (color == RED) ? YELLOW : RED;
+                        if (heuristic == maxValue) return heuristic;
+                        int value = MinMax(depth-1, advColor, testArray);
+                        if (out < value) out = value;
                     } else {
-                        int heuristic = heuristic(activeColour, testArray, a, b);
-                        if (heuristic == Integer.MAX_VALUE || heuristic == Integer.MIN_VALUE) return heuristic;
-                        int value = MinMax(depth-1, activeColour, testArray, row-1, i);
-                        if (out > value){
-                            out = value;
-                        }
+                        if (heuristic == minValue) return heuristic;
+                        int value = MinMax(depth-1, activeColour, testArray);
+                        if (out > value) out = value;
                     }
-                } else {
-                    break;
                 }
             }
         }
@@ -412,16 +415,15 @@ class Connect4JFrame extends JFrame implements ActionListener {
         int value = Integer.MIN_VALUE;
         for (int i = 0; i < MAXCOL; i++) {
             int row;
-            for (row = 0; row < MAXROW; row++)
+            for (row = 0; row < MAXROW; row++) {
                 if (theArray[row][i] > 0) break;
+            }
             if (row > 0) {
                 int[][] testArray = clone2dArray(theArray);
                 testArray[row - 1][i] = activeColour;
                 int advColor = RED;
-                if (activeColour == RED){
-                    advColor = YELLOW;
-                }
-                int tmp = MinMax(depth, advColor, testArray, row-1,i);
+                if (activeColour == RED) advColor = YELLOW;
+                int tmp = MinMax(depth, advColor, testArray);
                 if (tmp > value){
                     value = tmp;
                     choice = i;
