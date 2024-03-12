@@ -17,7 +17,9 @@ public class Connect4 {
         Connect4JFrame frame = new Connect4JFrame();
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        //frame.game();
+        /*while (!frame.end){
+            frame.game();
+        }*/
     }
 }
 
@@ -153,12 +155,11 @@ class Connect4JFrame extends JFrame implements ActionListener {
 
     public void game(){
         if (end) return;
-        if (activeColour == RED){
+        if (activeColour == RED && minmaxAgent){
             minmaxPlayer(5);
-        } else {
+        } else if (randomAgent) {
             randomPlayer();
         }
-        if (!end) game();
     }
 
     public void putDisk(int n) {
@@ -176,10 +177,9 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 movesRed++;
                 movesR.setText(String.valueOf(movesRed));
                 activeColour = YELLOW;
-                if (minmaxAgent) minmaxPlayer(5);
+                if (minmaxAgent) minmaxPlayer(6);
             } else {
                 movesYellow++;
-                //System.out.println(heuristic(RED, theArray));
                 movesY.setText(String.valueOf(movesYellow));
                 activeColour = RED;
                 //if (randomAgent) randomPlayer();
@@ -194,10 +194,13 @@ class Connect4JFrame extends JFrame implements ActionListener {
         minmaxAgent = false;
         g.setColor(Color.BLACK);
         g.setFont(new Font("Courier", Font.BOLD, 100));
-        if (n==RED)
+        if (n==RED) {
+            System.out.println("Red wins");
             g.drawString("Red wins!", 100, 400);
-        else
+        } else {
+            System.out.println("Yellow wins");
             g.drawString("Yellow wins!", 100, 400);
+        }
         end=true;
     }
 
@@ -382,7 +385,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
         return plays;
     }
 
-    public int MinMax(int depth, int color, int[][] deArray){
+    public int MinMax(int depth, int color, int[][] deArray, int a, int b){
         int out = (color == activeColour) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         if (depth == 0){
             return heuristic(activeColour, deArray);
@@ -397,12 +400,16 @@ class Connect4JFrame extends JFrame implements ActionListener {
                     if (color == activeColour){
                         int advColor = (color == RED) ? YELLOW : RED;
                         if (heuristic == maxValue) return heuristic;
-                        int value = MinMax(depth-1, advColor, testArray);
+                        int value = MinMax(depth-1, advColor, testArray, a, b);
                         if (out < value) out = value;
+                        if (out > a) a = out;
+                        if (out > b) return out;
                     } else {
                         if (heuristic == minValue) return heuristic;
-                        int value = MinMax(depth-1, activeColour, testArray);
+                        int value = MinMax(depth-1, activeColour, testArray, a, b);
                         if (out > value) out = value;
+                        if (out < b) b = out;
+                        if (out < a) return out;
                     }
                 }
             }
@@ -413,6 +420,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
     public void minmaxPlayer(int depth){
         int choice = 0;
         int value = Integer.MIN_VALUE;
+        int b = Integer.MAX_VALUE;
         for (int i = 0; i < MAXCOL; i++) {
             int row;
             for (row = 0; row < MAXROW; row++) {
@@ -423,13 +431,15 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 testArray[row - 1][i] = activeColour;
                 int advColor = RED;
                 if (activeColour == RED) advColor = YELLOW;
-                int tmp = MinMax(depth, advColor, testArray);
+                int tmp = MinMax(depth, advColor, testArray, value, b);
+                System.out.println(i+": " +tmp);
                 if (tmp > value){
                     value = tmp;
                     choice = i;
                 }
             }
         }
+        System.out.println("My choice is: " +choice);
         putDisk(choice+1);
     }
 
