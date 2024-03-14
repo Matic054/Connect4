@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLOutput;
 import java.util.Random;
 import javax.swing.*;
 
@@ -17,9 +18,6 @@ public class Connect4 {
         Connect4JFrame frame = new Connect4JFrame();
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        /*while (!frame.end){
-            frame.game();
-        }*/
     }
 }
 
@@ -32,7 +30,7 @@ class Connect4JFrame extends JFrame implements ActionListener {
     boolean                 end=false;
     boolean                 gameStart;
 
-    boolean                 randomAgent=true;
+    boolean                 randomAgent=false;
 
     boolean                 minmaxAgent=true;
     public static final int BLANK = 0;
@@ -48,6 +46,12 @@ class Connect4JFrame extends JFrame implements ActionListener {
     public static final String SPACE = "                  "; // 18 spaces
 
     int activeColour = RED;
+
+    int games = 100;
+
+    int YellowWins = 0;
+
+    int RedWins = 0;
 
     public static int movesRed = 0;
     public static int movesYellow = 0;
@@ -151,16 +155,24 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 g.fillOval(160+100*col, 100+100*row, 100, 100);
             }
         check4(g);
+        if (!end){
+            if (activeColour==RED){
+                if (randomAgent) randomPlayer();
+            } else {
+                if (minmaxAgent) minmaxPlayer(5);
+            }
+        } else if (games > 0) {
+            end = false;
+            games--;
+            //randomAgent = true;
+            //minmaxAgent = true;
+            //initialize();
+            //repaint();
+        } else {
+            System.out.println("Yellow wins: " + YellowWins + " times" + " and Red wins: " + RedWins + " times");
+        }
     } // paint
 
-    public void game(){
-        if (end) return;
-        if (activeColour == RED && minmaxAgent){
-            minmaxPlayer(5);
-        } else if (randomAgent) {
-            randomPlayer();
-        }
-    }
 
     public void putDisk(int n) {
         // put a disk on top of column n
@@ -169,20 +181,17 @@ class Connect4JFrame extends JFrame implements ActionListener {
         gameStart=true;
         int row;
         n--;
-        for (row=0; row<MAXROW; row++)
-            if (theArray[row][n]>0) break;
+        for (row=0; row<MAXROW; row++) if (theArray[row][n]>0) break;
         if (row>0) {
             theArray[--row][n]=activeColour;
             if (activeColour==RED) {
                 movesRed++;
                 movesR.setText(String.valueOf(movesRed));
                 activeColour = YELLOW;
-                if (minmaxAgent) minmaxPlayer(6);
             } else {
                 movesYellow++;
                 movesY.setText(String.valueOf(movesYellow));
                 activeColour = RED;
-                //if (randomAgent) randomPlayer();
             }
             movesT.setText(String.valueOf(movesRed+movesYellow));
             repaint();
@@ -190,15 +199,13 @@ class Connect4JFrame extends JFrame implements ActionListener {
     }
 
     public void displayWinner(Graphics g, int n) {
-        randomAgent = false;
-        minmaxAgent = false;
         g.setColor(Color.BLACK);
         g.setFont(new Font("Courier", Font.BOLD, 100));
         if (n==RED) {
-            System.out.println("Red wins");
+            RedWins++;
             g.drawString("Red wins!", 100, 400);
         } else {
-            System.out.println("Yellow wins");
+            YellowWins++;
             g.drawString("Yellow wins!", 100, 400);
         }
         end=true;
@@ -432,14 +439,12 @@ class Connect4JFrame extends JFrame implements ActionListener {
                 int advColor = RED;
                 if (activeColour == RED) advColor = YELLOW;
                 int tmp = MinMax(depth, advColor, testArray, value, b);
-                System.out.println(i+": " +tmp);
                 if (tmp > value){
                     value = tmp;
                     choice = i;
                 }
             }
         }
-        System.out.println("My choice is: " +choice);
         putDisk(choice+1);
     }
 
